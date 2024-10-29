@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{{ user.username }}
+{% for car in user_cars %}
+<p><a href="{% url 'car-detail' pk=car.pk %}">{{car.make}}</a></p>
+{% endfor %}
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {{ car.make }}
+    {{ car.model }}
+    {{ car.year }}
+    {{ car.description }}
+<h1>Список комментариев</h1>
+    <ul>
+        {% for comment in comments %}
+            <li>{{ comment.content }} - {{ comment.author }}</li>
+        {% empty %}
+            <li>Нет комментариев.</li>
+        {% endfor %}
+    </ul>
+    <h2>Добавить комментарий:</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Опубликовать</button>
+    </form>
+</body>
+</html>

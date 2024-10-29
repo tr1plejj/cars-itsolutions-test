@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+<body>
+    <h1>Список машин</h1>
+    <ul>
+        {% for car in cars %}
+            <li><a href="{% url 'car-detail' pk=car.pk %}">{{ car.make }} - {{ car.model }} - {{ car.year }}</a></li>
+        {% empty %}
+            <li>Нет доступных машин.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
