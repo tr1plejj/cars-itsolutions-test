@@ -1,10 +1,13 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 from cars.forms import CarForm, CommentForm
 from cars.models import Car, Comment
+from django.http import HttpResponseForbidden
 
 
 class CarListView(ListView):
@@ -15,7 +18,7 @@ class CarListView(ListView):
     context_object_name = 'cars'
 
 
-class CarDetailWithCommentView(LoginRequiredMixin, View):
+class CarDetailWithCommentView(View):
     """Просмотр конкретной машины, комментариев к ней и создание комментария."""
 
     template_name = 'cars/car_detail.html'
@@ -33,6 +36,7 @@ class CarDetailWithCommentView(LoginRequiredMixin, View):
 
         return render(request, self.template_name, context)
 
+    @method_decorator(login_required)
     def post(self, request, pk, *args, **kwargs):
         car = get_object_or_404(Car, pk=pk)
         form = CommentForm(request.POST)
@@ -65,3 +69,45 @@ class CarCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('car-detail', kwargs={'pk': self.object.pk})
+
+
+class CarDeleteView(LoginRequiredMixin, DeleteView):
+    """Удаление автомобиля."""
+
+    model = Car
+    template_name = 'cars/delete_car.html'
+    success_url = reverse_lazy('user-profile')
+
+    def dispatch(self, request, *args, **kwargs):
+        # Получаем объект
+        self.object = self.get_object()
+        # Проверяем, является ли текущий пользователь создателем объекта
+        if self.object.owner != request.user:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+    def handle_no_permission(self):
+        return HttpResponseForbidden("У вас нет прав для удаления этого объекта.")
+
+
+class CarUpdateView(LoginRequiredMixin, UpdateView):
+    """Редактирование автомобиля."""
+
+    form_class = CarForm
+    model = Car
+    template_name = 'cars/update_car.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Получаем объект
+        self.object = self.get_object()
+        # Проверяем, является ли текущий пользователь создателем объекта
+        if self.object.owner != request.user:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+    def handle_no_permission(self):
+        return HttpResponseForbidden("У вас нет прав для изменения этого объекта.")
+
+    def get_success_url(self):
+        return reverse('car-detail', kwargs={'pk': self.object.pk})
+

@@ -11,7 +11,7 @@ User = get_user_model()
 class RegistrationView(CreateView):
     """Регистрация пользователя."""
 
-    template_name = 'cars/registration.html'
+    template_name = 'registration/registration.html'
     form_class = RegistrationForm
     success_url = reverse_lazy('login')
 

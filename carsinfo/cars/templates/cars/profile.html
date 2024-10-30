@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{{ user.username }}
+{% extends 'cars/base.html' %}
+
+{% block content %}
+<h1>Профиль {{ user.username }}</h1>
+<p><a href="{% url 'logout' %}">Выйти из аккаунта</a></p>
+<p><a href="{% url 'car-create' %}">Добавить новый автомобиль</a></p>
+<h2>Ваши добавленные автомобили: </h2>
 {% for car in user_cars %}
 <p><a href="{% url 'car-detail' pk=car.pk %}">{{car.make}}</a></p>
 {% endfor %}
-</body>
-</html>
+{% endblock %}
